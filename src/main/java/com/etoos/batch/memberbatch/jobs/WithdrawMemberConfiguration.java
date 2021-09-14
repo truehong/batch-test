@@ -45,7 +45,7 @@ public class WithdrawMemberConfiguration {
     @Bean
     public Job job() {
         log.info(">>>>> withdrawMemberJob init");
-        return jobBuilderFactory.get(JOB_NAME)
+        return jobBuilderFactory.get("updateWithdrawMembersJob")
                 .start(updateStep(null))
                 .next(deleteStep(null))
                 .build();
