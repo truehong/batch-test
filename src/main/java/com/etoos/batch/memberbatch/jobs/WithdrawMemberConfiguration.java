@@ -1,5 +1,7 @@
 package com.etoos.batch.memberbatch.jobs;
 
+import static com.etoos.batch.memberbatch.jobs.WithdrawMemberConfiguration.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -11,6 +13,7 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,8 +33,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(name="job.name", havingValue = JOB_NAME)
 public class WithdrawMemberConfiguration {
 
+    public static final String JOB_NAME = "updateWithdrawMembersJob";
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final MemberWithdrawService memberWithdrawService;
@@ -40,7 +45,7 @@ public class WithdrawMemberConfiguration {
     @Bean
     public Job job() {
         log.info(">>>>> withdrawMemberJob init");
-        return jobBuilderFactory.get("updateWithdrawMembersJob")
+        return jobBuilderFactory.get(JOB_NAME)
                 .start(updateStep(null))
                 .next(deleteStep(null))
                 .build();
