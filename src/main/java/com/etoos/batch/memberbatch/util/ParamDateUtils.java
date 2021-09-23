@@ -28,9 +28,9 @@ public class ParamDateUtils {
         final LocalDate localDate = Optional.ofNullable(strDate)
                 .map(d -> LocalDate.parse(d, DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .orElseGet(LocalDate::now);
-        if (LocalDate.now().isBefore(localDate)) {
-            throw new JobServiceException(LATER_THAN_ERROR_MESSAGE);
-        }
+        // if (LocalDate.now().isBefore(localDate)) {
+        //     throw new JobServiceException(LATER_THAN_ERROR_MESSAGE);
+        // }
 
         return localDate;
     }
