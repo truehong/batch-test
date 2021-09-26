@@ -9,8 +9,10 @@ import com.etoos.batch.memberbatch.enums.YNCode;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
+@ToString
 @NoArgsConstructor(access =  AccessLevel.PROTECTED)
 @Table(name ="mmm_withdraw")
 public class WithdrawMember extends AuditableRegisterEntity{
@@ -53,4 +55,6 @@ public class WithdrawMember extends AuditableRegisterEntity{
 
     @Column(name = "load_detail_address", nullable = true, length = 200)
     private String loadDetailAddress;
+
+
 }

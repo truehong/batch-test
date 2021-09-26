@@ -20,7 +20,7 @@ public class QuartzConfiguration {
     public Trigger jobTrigger () {
         return TriggerBuilder.newTrigger()
                 .forJob(quartzJobDetail())
-                .withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(13, 14))
+                .withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(21, 39))
                 .build();
     }
 }
