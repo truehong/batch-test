@@ -27,7 +27,7 @@ public class BatchScheduledJob extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         try {
             final JobParametersBuilder jobParametersBuilder = new JobParametersBuilder()
-                    .addString("requestDate","20210103");
+                    .addString("requestDate","20210202");
             // LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
 
             context.setResult(jobLauncher.run(job, jobParametersBuilder.toJobParameters()));

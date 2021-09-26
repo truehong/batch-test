@@ -20,6 +20,5 @@ import com.etoos.batch.memberbatch.entities.WithdrawMember;
 public interface MemberWithdrawRepository extends JpaRepository<WithdrawMember, Long> {
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("DELETE FROM WithdrawMember e WHERE e.registeredAt < ?1")
-    void deleteAllByRegisteredAtLessThan(LocalDateTime registeredAt);
+    void deleteByNo(Long no);
 }

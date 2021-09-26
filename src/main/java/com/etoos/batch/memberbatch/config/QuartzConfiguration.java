@@ -24,7 +24,7 @@ public class QuartzConfiguration {
     public Trigger jobTrigger() {
         return TriggerBuilder.newTrigger()
                 .forJob(quartzJobDetail())
-                .withSchedule( CronScheduleBuilder.dailyAtHourAndMinute(18,35))
+               // .withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(22,54))
                 .build();
     }
 }

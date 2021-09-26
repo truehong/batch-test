@@ -10,12 +10,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class MemberWithdrawServiceImpl implements MemberWithdrawService{
+public class MemberWithdrawServiceImpl implements MemberWithdrawService {
 
     private final MemberWithdrawRepository memberWithdrawRepository;
 
     @Override
-    public void deleteWithdrawMember(LocalDateTime registeredAt) {
-        memberWithdrawRepository.deleteAllByRegisteredAtLessThan(registeredAt);
+    public void deleteByNo(Long no) {
+        memberWithdrawRepository.deleteByNo(no);
     }
 }

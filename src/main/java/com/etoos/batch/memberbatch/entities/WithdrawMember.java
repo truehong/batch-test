@@ -8,19 +8,21 @@ import javax.persistence.Table;
 import com.etoos.batch.memberbatch.enums.YNCode;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@ToString
+@Getter
 @NoArgsConstructor(access =  AccessLevel.PROTECTED)
 @Table(name ="mmm_withdraw")
+@ToString
 public class WithdrawMember extends AuditableRegisterEntity{
     @Id
     @Column(name ="member_no", nullable = false)
     private Long no;
 
-    @Column(name = "withdraw_terms_agree_yn", nullable = false)
+    @Column(name = "withdraw_terms_agree_yn", nullable = true)
     private YNCode agreeYn;
 
     @Column(name = "member_id", nullable = true, length = 50)
@@ -55,6 +57,5 @@ public class WithdrawMember extends AuditableRegisterEntity{
 
     @Column(name = "load_detail_address", nullable = true, length = 200)
     private String loadDetailAddress;
-
 
 }

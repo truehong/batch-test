@@ -18,7 +18,7 @@ import lombok.Getter;
 public class AuditableRegisterEntity {
     @CreatedDate
     @Column(name = "register_ymdt", updatable = false)
-    protected LocalDateTime registeredAt;
+    protected String registeredAt;
 
     @CreatedBy
     @Column(updatable = false)

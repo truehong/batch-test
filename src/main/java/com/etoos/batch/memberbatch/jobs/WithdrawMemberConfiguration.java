@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.etoos.batch.memberbatch.entities.WithdrawMember;
 import com.etoos.batch.memberbatch.exception.JobServiceException;
+import com.etoos.batch.memberbatch.listener.EmptyInputStepFailer;
 import com.etoos.batch.memberbatch.service.MemberWithdrawService;
 import com.etoos.batch.memberbatch.util.ParamDateUtils;
 
@@ -57,25 +58,33 @@ public class WithdrawMemberConfiguration {
         log.info(">>>>> withdrawMemberJob init");
         return jobBuilderFactory.get("deleteExpiredMembersJob")
                 .preventRestart()
-                .start(deleteStep(null))
+                .start(deleteStep())
                 .build();
     }
 
 
     @Bean
+    public EmptyInputStepFailer emptyInputStepFailer() {
+        return new EmptyInputStepFailer();
+    }
+
+
+    @Bean
     @JobScope
-    public Step deleteStep(@Value("#{jobParameters[requestDate]}") String requestDate) throws JobServiceException {
+    public Step deleteStep() throws JobServiceException {
         return stepBuilderFactory.get("deleteExpiredMembersStep")
-                .<WithdrawMember, WithdrawMember> chunk(100)
+                .<WithdrawMember, WithdrawMember> chunk(10)
                 .reader(deleteReader(entityManagerFactory, null))
                 .writer(deleteWriter())
                 .build();
     }
 
-    private ItemWriter<WithdrawMember> deleteWriter() {
+    @Bean
+    @StepScope
+    public ItemWriter<WithdrawMember> deleteWriter() {
         return items -> {
-            for (WithdrawMember member : items) {
-                log.info( "Member = {}" , member.toString());
+            for (WithdrawMember member : items){
+                memberWithdrawService.deleteByNo(member.getNo());
             }
         };
     }
@@ -95,8 +104,8 @@ public class WithdrawMemberConfiguration {
                 .build();
     }
 
-    private LocalDateTime changeDateFormatOf(String strDate) throws JobServiceException {
+    private String changeDateFormatOf(String strDate) throws JobServiceException {
         final LocalDate localDate = ParamDateUtils.parseLocalDate(strDate);
-        return localDate.minusDays(30).atTime(LocalTime.MIN);
+        return localDate.minusDays(30).atTime(LocalTime.MIN).toString();
     }
 }
