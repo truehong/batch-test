@@ -4,11 +4,13 @@ srping:
 
 
 spring.batch.job.names: ${job.name:NONE}
+server:
+  port: 18080
 ---
 spring:
   datasource:
     hikari:
-      jdbc-url: jdbc:h2:tcp://localhost/~/test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      jdbc-url: jdbc:h2:tcp://localhost/~/test
       username: sa
       password:
       driver-class-name: org.h2.Driver
@@ -17,7 +19,7 @@ spring:
       on-profile: local
   jpa:
     hibernate:
-      ddl-auto: update #update
+      ddl-auto: create #update
     properties:
       hibernate:
         show_sql: true

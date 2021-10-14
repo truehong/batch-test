@@ -4,7 +4,7 @@
  * Copyright 2021 Etoos Education. All rights Reserved.
  * Etoos PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
-package com.etoos.batch.memberbatch.util;
+package com.etoos.batch.memberbatch.utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
