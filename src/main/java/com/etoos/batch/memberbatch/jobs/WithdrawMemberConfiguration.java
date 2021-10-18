@@ -3,8 +3,11 @@ package com.etoos.batch.memberbatch.jobs;
 import static com.etoos.batch.memberbatch.jobs.WithdrawMemberConfiguration.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Date;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -17,6 +20,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -47,7 +51,6 @@ public class WithdrawMemberConfiguration {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final MemberWithdrawService memberWithdrawService;
-//    private final EntityManagerFactory entityManagerFactory;
 
 
     @Bean
@@ -70,39 +73,11 @@ public class WithdrawMemberConfiguration {
     @JobScope
     public Step deleteStep() throws JobServiceException {
         return stepBuilderFactory.get("deleteExpiredMembersStep")
-                .<WithdrawMember, WithdrawMember> chunk(10)
-           //     .reader(deleteReader(entityManagerFactory, null))
-                .writer(deleteWriter())
-                .build();
+                .tasklet((contribution, chunkContext) -> {
+                    memberWithdrawService.deleteAllByRegisteredAtBefore(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+                    return RepeatStatus.FINISHED;
+                }).build();
+
     }
 
-    @Bean
-    @StepScope
-    public ItemWriter<WithdrawMember> deleteWriter() {
-        return items -> {
-            for (WithdrawMember member : items){
-                memberWithdrawService.deleteByNo(member.getNo());
-            }
-        };
-    }
-
-    // @Bean
-    // @StepScope
-    // public JpaPagingItemReader<WithdrawMember> deleteReader(EntityManagerFactory entityManagerFactory,
-    //         @Value("#{jobParameters[requestDate]}") String requestDate) throws JobServiceException {
-    //     WithdrawMemberByQueryProvider queryProvider = new WithdrawMemberByQueryProvider();
-    //     queryProvider.setRequestDate(changeDateFormatOf(requestDate));
-    //
-    //     return new JpaPagingItemReaderBuilder<WithdrawMember>()
-    //             .name("withdrawItemReader")
-    //             .entityManagerFactory(entityManagerFactory)
-    //             .queryProvider(queryProvider)
-    //             .parameterValues(Collections.singletonMap("requestDate", requestDate))
-    //             .build();
-    // }
-
-    private String changeDateFormatOf(String strDate) throws JobServiceException {
-        final LocalDate localDate = ParamDateUtils.parseLocalDate(strDate);
-        return localDate.minusDays(30).atTime(LocalTime.MIN).toString();
-    }
 }

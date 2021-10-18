@@ -18,4 +18,10 @@ public class MemberWithdrawServiceImpl implements MemberWithdrawService {
     public void deleteByNo(Long no) {
         memberWithdrawRepository.deleteByNo(no);
     }
+
+    @Override
+    public void deleteAllByRegisteredAtBefore(String date) {
+        memberWithdrawRepository.deleteAllByRegisteredAtBefore(date);
+
+    }
 }

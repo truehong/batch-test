@@ -21,4 +21,6 @@ public interface MemberWithdrawRepository extends JpaRepository<WithdrawMember, 
     @Modifying(clearAutomatically = true)
     @Transactional
     void deleteByNo(Long no);
+
+    void deleteAllByRegisteredAtBefore(String RegisterAt);
 }

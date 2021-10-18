@@ -10,6 +10,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -17,11 +18,16 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import com.etoos.batch.memberbatch.enums.JobName;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 public class SchedulerJob extends QuartzJobBean {
+
+
+    private final ApplicationContext applicationContext;
 
     /**
      * Execute the actual job. The job data map will already have been
@@ -36,19 +42,21 @@ public class SchedulerJob extends QuartzJobBean {
         final JobDetail jobDetail = context.getJobDetail();
         final JobDataMap dataMap = jobDetail.getJobDataMap();
 
-        final ApplicationContext applicationContext =
-                (ApplicationContext)context.getScheduler().getContext().get("applicationContext");
-        final JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
-        final Job job = (Job)applicationContext.getBean(dataMap.getString(JobName.findByJob("jobName").getJob()));
-        final JobParametersBuilder jobParametersBuilder = new JobParametersBuilder()
-                .addString("uuid", UUID.randomUUID().toString())
-                .addString("fireDate", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
-        for (String key : dataMap.getKeys()) {
-            jobParametersBuilder.addString(key, dataMap.getString(key));
-            log.info("Execute Job! job-key: {}, key: {}, value: {}",
-                    jobDetail.getKey(), key, dataMap.getString(key));
-        }
-        context.setResult(jobLauncher.run(job, jobParametersBuilder.toJobParameters()));
+        try {
 
+            final JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
+            final Job job = (Job)applicationContext.getBean(SimpleJob.class);
+            final JobParametersBuilder jobParametersBuilder = new JobParametersBuilder()
+                    .addString("uuid", UUID.randomUUID().toString())
+                    .addString("fireDate", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+            for (String key : dataMap.getKeys()) {
+                jobParametersBuilder.addString(key, dataMap.getString(key));
+                log.info("Execute Job! job-key: {}, key: {}, value: {}",
+                        jobDetail.getKey(), key, dataMap.getString(key));
+            }
+            context.setResult(jobLauncher.run(job, jobParametersBuilder.toJobParameters()));
+        } catch (Exception ex) {
+            throw new JobExecutionException(ex);
+        }
     }
 }

@@ -10,7 +10,7 @@ import lombok.Getter;
 public class ScheduleRequest {
     private String name;
 
-    private String jobName;
+    private JobName jobName;
 
     private String cronExpression;
 
