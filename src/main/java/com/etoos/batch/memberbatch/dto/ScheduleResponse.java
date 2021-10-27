@@ -11,8 +11,6 @@ import org.quartz.CronTrigger;
 import org.quartz.JobKey;
 import org.quartz.Trigger;
 
-import com.etoos.batch.memberbatch.enums.JobName;
-
 import lombok.Builder;
 import lombok.Data;
 

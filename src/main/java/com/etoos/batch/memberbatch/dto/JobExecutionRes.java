@@ -17,7 +17,8 @@ import lombok.Data;
 @Builder
 @Data
 public class JobExecutionRes {
-  private JobInstance jobInstance;
+  private String jobName;
+  private Long jobId;
   private Date createTime;
   private Date startDate;
   private Date endTime;
@@ -27,7 +28,8 @@ public class JobExecutionRes {
 
   public static JobExecutionRes of(JobExecution execution) {
       return JobExecutionRes.builder()
-              .jobInstance(execution.getJobInstance())
+              .jobName(execution.getJobInstance().getJobName())
+              .jobId(execution.getJobInstance().getId())
               .createTime(execution.getCreateTime())
               .startDate(execution.getStartTime())
               .endTime(execution.getEndTime())

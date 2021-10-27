@@ -1,18 +1,28 @@
 package com.etoos.batch.memberbatch.dto;
 
+import java.io.Serializable;
 import java.util.Map;
 
-import com.etoos.batch.memberbatch.enums.JobName;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-public class ScheduleRequest {
+@Setter
+public class ScheduleRequest implements Serializable {
+
+    private String jobClass;
+
+    private String jobName;
+
+    private String jobGroup;
+
     private String name;
 
-    private JobName jobName;
+    private Long repeatTime;
+
+    private Boolean cronJob;
 
     private String cronExpression;
 
-    private Map<String, String> parameter; // job 파라미터
 }

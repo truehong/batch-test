@@ -7,22 +7,23 @@ import org.quartz.SchedulerException;
 
 import com.etoos.batch.memberbatch.dto.ScheduleJob;
 import com.etoos.batch.memberbatch.dto.ScheduleRequest;
-import com.etoos.batch.memberbatch.dto.ScheduleResponse;
 
 public interface ScheduleJobService {
     List<ScheduleJob> getAllJobList() throws SchedulerException;
 
-    ScheduleResponse addJobSchedule(ScheduleRequest scheduleRequest) throws SchedulerException, ParseException;
+    void addJobSchedule(ScheduleRequest scheduleRequest) throws
+            SchedulerException,
+            ParseException,
+            ClassNotFoundException;
 
-    boolean deleteJobSchedule(ScheduleJob schedulerJob) throws SchedulerException;
+    void deleteJob(ScheduleRequest scheduleRequest) throws SchedulerException;
 
-    void addJob(ScheduleJob schedulerJob) throws Exception;
+    void pauseJob(ScheduleRequest scheduleRequest) throws SchedulerException;
 
-    void pauseJob(ScheduleJob scheduleJob) throws SchedulerException;
+    void resumeJob(ScheduleRequest scheduleRequest) throws SchedulerException;
 
-    void resumeJob(ScheduleJob scheduleJob) throws SchedulerException;
-
-    void deleteJob(ScheduleJob scheduleJob) throws SchedulerException;
 
     void updateJob(ScheduleJob scheduleJob);
+
+    void startJobNow(ScheduleRequest scheduleRequest) throws SchedulerException;
 }

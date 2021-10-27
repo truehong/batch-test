@@ -10,14 +10,10 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.etoos.batch.memberbatch.enums.JobName;
-
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -27,28 +23,24 @@ import lombok.extern.slf4j.Slf4j;
 public class SchedulerJob extends QuartzJobBean {
 
 
+    private final JobLauncher jobLauncher;
+
     private final ApplicationContext applicationContext;
 
-    /**
-     * Execute the actual job. The job data map will already have been
-     * applied as bean property values by execute. The contract is
-     * exactly the same as for the standard Quartz execute method.
-     * @see #execute
-     * @param context
-     */
     @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        System.out.println("SchedulerJob.executeInternal ========== called");
+
         final JobDetail jobDetail = context.getJobDetail();
         final JobDataMap dataMap = jobDetail.getJobDataMap();
-
+        // 이부분 다시 보기
         try {
 
-            final JobLauncher jobLauncher = applicationContext.getBean(JobLauncher.class);
-            final Job job = (Job)applicationContext.getBean(SimpleJob.class);
+            final Job job = (Job)applicationContext.getBean(dataMap.getString("jobName"));
             final JobParametersBuilder jobParametersBuilder = new JobParametersBuilder()
                     .addString("uuid", UUID.randomUUID().toString())
-                    .addString("fireDate", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+                    .addString("requestDate", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
             for (String key : dataMap.getKeys()) {
                 jobParametersBuilder.addString(key, dataMap.getString(key));
                 log.info("Execute Job! job-key: {}, key: {}, value: {}",
@@ -58,5 +50,7 @@ public class SchedulerJob extends QuartzJobBean {
         } catch (Exception ex) {
             throw new JobExecutionException(ex);
         }
+
+
     }
 }

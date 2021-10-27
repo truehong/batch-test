@@ -21,7 +21,7 @@ public class MemberWithdrawServiceImpl implements MemberWithdrawService {
 
     @Override
     public void deleteAllByRegisteredAtBefore(String date) {
-        memberWithdrawRepository.deleteAllByRegisteredAtBefore(date);
+        memberWithdrawRepository.deleteByRegisteredAtBefore(date);
 
     }
 }

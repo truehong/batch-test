@@ -44,16 +44,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(name="job.name", havingValue = JOB_NAME)
 public class WithdrawMemberConfiguration {
 
-    public static final String JOB_NAME = "updateWithdrawMembersJob";
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final MemberWithdrawService memberWithdrawService;
 
 
-    @Bean
+    @Bean(name = "deleteExpiredMembersJob")
     public Job job() throws JobServiceException {
         log.info(">>>>> withdrawMemberJob init");
         return jobBuilderFactory.get("deleteExpiredMembersJob")
