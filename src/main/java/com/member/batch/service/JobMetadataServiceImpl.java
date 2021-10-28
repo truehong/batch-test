@@ -22,13 +22,13 @@ public class JobMetadataServiceImpl implements JobMetadataService {
 
     private final JobExplorer jobExplorer;
 
-
     private final ApplicationContext applicationContext;
 
     @Override
     public List<JobExecutionRes> getJobHistories() throws Exception {
         List<String> jobNames = jobExplorer.getJobNames();
         List<JobExecutionRes> list = new ArrayList<>();
+        //todo : 수정
         List<JobInstance>  instances =  jobExplorer.getJobInstances(jobNames.get(0), 0 , 100);
         instances.forEach(i -> {
             if(jobExplorer.getJobExecution(i.getId()) != null) {

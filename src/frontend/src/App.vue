@@ -12,10 +12,10 @@
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="text-h6">
-            Quartz Admin
+             Quartz Admin
           </v-list-item-title>
           <v-list-item-subtitle>
-            for memeber batch
+            for member jobs
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>

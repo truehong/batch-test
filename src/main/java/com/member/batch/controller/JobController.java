@@ -26,7 +26,6 @@ import com.member.batch.service.ScheduleJobService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @RestController
 @RequestMapping("/schedulers")
@@ -40,10 +39,10 @@ public class JobController {
 
     @GetMapping("/jobs")
     public ResponseEntity<List<ScheduleJob>> getAllJobs() throws SchedulerException {
-        return ResponseEntity.ok(scheduleJobService.getAllJobList()) ;
+        return ResponseEntity.ok(scheduleJobService.getAllJobList());
     }
 
-    @PostMapping("/job")
+    @PutMapping("/job")
     public ResponseEntity<ScheduleResponse> createJob(@RequestBody ScheduleRequest scheduleRequest) throws
             SchedulerException,
             ParseException,
@@ -64,7 +63,6 @@ public class JobController {
         scheduleJobService.pauseJob(scheduleRequest);
     }
 
-
     @PutMapping("/resume")
     public void resumeJobSchedule(@RequestBody ScheduleRequest scheduleRequest) throws SchedulerException {
         scheduleJobService.resumeJob(scheduleRequest);
@@ -84,6 +82,6 @@ public class JobController {
 
     @GetMapping("/classes")
     public ResponseEntity<Set<String>> getJobBeans() {
-      return new ResponseEntity<>(metadataService.getJobBeans(), HttpStatus.OK);
+        return new ResponseEntity<>(metadataService.getJobBeans(), HttpStatus.OK);
     }
 }

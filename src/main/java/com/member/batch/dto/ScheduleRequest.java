@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ScheduleRequest implements Serializable {
+    private String jobKey;
 
     private String jobClass;
 

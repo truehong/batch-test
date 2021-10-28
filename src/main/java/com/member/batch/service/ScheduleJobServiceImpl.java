@@ -28,16 +28,14 @@ import com.member.batch.quartz.SchedulerJob;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ScheduleJobServiceImpl implements ScheduleJobService{
+public class ScheduleJobServiceImpl implements ScheduleJobService {
 
     private final ApplicationContext context;
 
     private final SchedulerFactoryBean schedulerFactoryBean;
-
 
     private final JobScheduleCreator scheduleCreator;
 
@@ -45,23 +43,24 @@ public class ScheduleJobServiceImpl implements ScheduleJobService{
 
     @Override
     public List<ScheduleJob> getAllJobList() throws SchedulerException {
-       List<ScheduleJob> jobList = new ArrayList<>();
-       GroupMatcher<JobKey> matcher = GroupMatcher.anyJobGroup();
-       Set<JobKey> jobKeySet = scheduler.getJobKeys(matcher);
-       for(JobKey jobKey : jobKeySet) {
-           List< ? extends  Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
-           for(Trigger trigger : triggers) {
-               ScheduleJob scheduleJob = new ScheduleJob();
-               this.wrapScheduleJob(scheduleJob, scheduler, jobKey, trigger);
-               jobList.add(scheduleJob);
-           }
-       }
+        List<ScheduleJob> jobList = new ArrayList<>();
+        GroupMatcher<JobKey> matcher = GroupMatcher.anyJobGroup();
+        Set<JobKey> jobKeySet = scheduler.getJobKeys(matcher);
+        for (JobKey jobKey : jobKeySet) {
+            List<? extends Trigger> triggers = scheduler.getTriggersOfJob(jobKey);
+            for (Trigger trigger : triggers) {
+                ScheduleJob scheduleJob = new ScheduleJob();
+                this.wrapScheduleJob(scheduleJob, scheduler, jobKey, trigger);
+                jobList.add(scheduleJob);
+            }
+        }
         return jobList;
     }
 
     @Override
     public void addJobSchedule(ScheduleRequest scheduleRequest) throws SchedulerException {
-        String jobName = "deleteExpiredMembersJob";
+        String jobName = String.valueOf(System.currentTimeMillis());
+        scheduleRequest.setJobName(jobName);
 
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
@@ -69,7 +68,7 @@ public class ScheduleJobServiceImpl implements ScheduleJobService{
                 .withIdentity(jobName, scheduleRequest.getJobGroup()).build();
         if (!scheduler.checkExists(jobDetail.getKey())) {
 
-            jobDetail = scheduleCreator.createJob(SchedulerJob.class, false, context, jobName, scheduleRequest.getJobGroup());
+            jobDetail = scheduleCreator.createJob(SchedulerJob.class, false, context, scheduleRequest);
 
             Trigger trigger;
             if (scheduleRequest.getCronJob()) {
@@ -103,7 +102,7 @@ public class ScheduleJobServiceImpl implements ScheduleJobService{
     @Override
     public void deleteJob(ScheduleRequest scheduleRequest) throws SchedulerException {
         JobKey jobKey = JobKey.jobKey(scheduleRequest.getJobName().toString(), scheduleRequest.getJobGroup());
-        if(isJobScheduleRunning(jobKey)){
+        if (isJobScheduleRunning(jobKey)) {
             throw new SchedulerException("dsf");
         }
 
@@ -118,7 +117,8 @@ public class ScheduleJobServiceImpl implements ScheduleJobService{
 
     @Override
     public void startJobNow(ScheduleRequest scheduleRequest) throws SchedulerException {
-        schedulerFactoryBean.getScheduler().triggerJob(new JobKey(scheduleRequest.getJobName(), scheduleRequest.getJobGroup()));
+        schedulerFactoryBean.getScheduler()
+                .triggerJob(new JobKey(scheduleRequest.getJobName(), scheduleRequest.getJobGroup()));
     }
 
     private void wrapScheduleJob(ScheduleJob scheduleJob, Scheduler scheduler, JobKey jobKey, Trigger trigger) throws
@@ -127,6 +127,7 @@ public class ScheduleJobServiceImpl implements ScheduleJobService{
         scheduler.getMetaData().getJobStoreClass();
         scheduleJob.setJobName(jobKey.getName());
         scheduleJob.setJobGroup(jobKey.getGroup());
+        scheduleJob.setJobClass(String.valueOf(jobDetail.getJobDataMap().get("jobName")));
 
         Trigger.TriggerState triggerState = scheduler.getTriggerState(trigger.getKey());
         scheduleJob.setJobStatus(triggerState.name());
@@ -135,21 +136,20 @@ public class ScheduleJobServiceImpl implements ScheduleJobService{
         scheduleJob.setDesc(scheduleJob.getDesc());
         scheduleJob.setJobKey(jobDetail.getKey().toString());
 
-        if(trigger instanceof CronTrigger) {
-            CronTrigger cronTrigger = (CronTrigger) trigger;
+        if (trigger instanceof CronTrigger) {
+            CronTrigger cronTrigger = (CronTrigger)trigger;
             String cronExpression = cronTrigger.getCronExpression();
             scheduleJob.setCronExpression(cronExpression);
         }
     }
 
     private boolean isJobScheduleRunning(JobKey jobkey) throws SchedulerException {
-       final List<JobExecutionContext> executingJobSchedules = schedulerFactoryBean.getScheduler().getCurrentlyExecutingJobs();
+        final List<JobExecutionContext> executingJobSchedules = schedulerFactoryBean.getScheduler()
+                .getCurrentlyExecutingJobs();
         return Optional.ofNullable(executingJobSchedules)
                 .map(executingSchedules -> executingSchedules.stream()
                         .anyMatch(s -> s.getJobDetail().getKey().compareTo(jobkey) == 0))
                 .orElse(false);
     }
-
-
 
 }

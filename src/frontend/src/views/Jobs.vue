@@ -62,13 +62,13 @@
       <v-icon
           small
           class="mr-2"
-          @click="editItem(item)">
+          @click="resumeItem(item)">
         mdi-pencil
       </v-icon>
       /
       <v-icon
           small
-          @click="deleteItem(item)">
+          @click="stopItem(item)">
         mdi-delete
       </v-icon>
 
@@ -98,13 +98,13 @@ export default {
     dialog: false,
     headers: [
       {
-        text: 'Job 이름',
+        text: 'Job Key',
         align: 'start',
         sortable: false,
-        value: 'jobName'
+        value: 'jobKey'
       },
       { text: 'Job 그룹', value: 'jobGroup' },
-      { text: 'job 클래스명', value: 'ExpriedMember' },
+      { text: 'job 클래스명', value: 'jobClass' },
       { text: '지난 실행일', value: 'lastFiredTime' },
       { text: '다음 실행일', value: 'nextFiredTime' },
       { text: 'Cron 표현식', value: 'cronExpression' },
@@ -160,15 +160,39 @@ export default {
       }).catch()
 
     },
-    editItem (item) {
+    editItem(item) {
       this.editedIndex = this.desserts.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
-    deleteItem (item) {
+    deleteItem(item) {
       const index = this.desserts.indexOf(item)
-
-      confirm('정말로 삭제 하시겠습니까??') && this.desserts.splice(index, 1)
+      confirm('정말로 삭제 하시겠습니까??') && this.desserts.splice(index, 1) &&
+      axios.delete("http://localhost:8087/schedulers/job", {jobKey : item.jobKey, jobName : item.jobName, jobGroup : item.jobGroup})
+          .then(response => {
+            this.initialize();
+            console.log(response)
+          })
+    },resumeItem(item) {
+      confirm('재시작 하겠습니까?') &&
+      axios.put("http://localhost:8087/schedulers/resume", {jobKey : item.jobKey, jobName : item.jobName, jobGroup : item.jobGroup})
+          .then(response => {
+            this.initialize();
+            console.log(response)
+          })
+    },stopItem(item) {
+      confirm('중단하시겠습니까?') &&
+      axios.put("http://localhost:8087/schedulers/pause", {jobKey : item.jobKey, jobName : item.jobName, jobGroup : item.jobGroup})
+          .then(response => {
+            this.initialize();
+            console.log(response)
+          })
+    },startNowJob(item) {
+      confirm('바로 시작하겠습니까?') &&
+      axios.put("http://localhost:8087/schedulers/now", {jobKey : item.jobKey, jobName : item.jobName, jobGroup : item.jobGroup})
+          .then(response => {
+            console.log(response)
+          })
     },
     close () {
       this.dialog = false
@@ -183,15 +207,13 @@ export default {
       } else {
         this.desserts.push(this.editedItem)
       }
-
-      axios.post("http://localhost:8087/schedulers/jobs", {
-        jobName : this.editedItem.jobName, jobGroup : this.editedItem.jobGroup, cronExpression : this.editedItem.cronExpression, cronJob : true
+      axios.put("http://localhost:8087/schedulers/job", {
+        jobClass : this.editedItem.jobName, jobGroup : this.editedItem.jobGroup, cronExpression : this.editedItem.cronExpression, cronJob : true
       }).then(response =>{
         this.desserts = response.data;
-        console.log(response.data);
       }).catch()
-
       this.close()
+      this.initialize();
     },
     dlg () {
       axios.get("http://localhost:8087/schedulers/classes", {

@@ -19,7 +19,10 @@ public class ScheduleJob implements Serializable{
     private String jobName;
     
     private String jobGroup;
-    
+
+
+    private String jobClass;
+
     private String jobStatus;
     
     private String cronExpression;

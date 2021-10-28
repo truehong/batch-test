@@ -15,6 +15,7 @@ import lombok.Data;
 @Data
 public class JobExecutionRes {
   private String jobName;
+  private String jobKey;
   private Long jobId;
   private Date createTime;
   private Date startDate;

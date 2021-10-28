@@ -56,6 +56,7 @@ public class WithdrawMemberConfiguration {
     public Step deleteStep() throws JobServiceException {
         return stepBuilderFactory.get("deleteExpiredMembersStep")
                 .tasklet((contribution, chunkContext) -> {
+                    log.info("called deleteStep");
                     memberWithdrawService.deleteAllByRegisteredAtBefore(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
                     return RepeatStatus.FINISHED;
                 }).build();
